@@ -2,11 +2,9 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace std;
-
 int main() {
     unsigned seed;
-    cout << RAND_MAX << " is rand_max.\n";
+    std::cout << RAND_MAX << " is rand_max.\n";
 
     int total_n = 10000;
     int count = 0;
@@ -19,9 +17,9 @@ int main() {
         }
 
     }
-    cout << "Total count at last is " << count << endl;
+    std::cout << "Total count at last is " << count << std::endl;
     double ratio = static_cast<double>(count) / total_n;
-    cout << ratio << " out of " << total_n << " was head. \n";
+    std::cout << ratio << " out of " << total_n << " was head. \n";
 
     return 0;
 }
