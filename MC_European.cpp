@@ -7,8 +7,8 @@
 #include <chrono>
 
 // want to change these to const function. They don't modify things
-double one_step (double &old, double &inRate, double &vol, double &dt);
-double end_price (int &steps, double &start, double &inRate, double &vol, double &dt);
+double one_step (const double &, double &, double &, double &);
+double end_price (const int &, double &, double &, double &, double &);
 //double max_price ();
 
 
@@ -36,7 +36,7 @@ int main() {
 }
 
 
-double one_step (double &old, double &inRate, double &vol, double &dt){
+double one_step (const double &old, double &inRate, double &vol, double &dt){
 // the structure of the code, creat obj each time, is this too messy/expensive?
     //minstd_rand0 generator;
     std::normal_distribution<double> norDist(0.0, 1.0);
@@ -49,7 +49,7 @@ double one_step (double &old, double &inRate, double &vol, double &dt){
     return new_price;
 }
 
-double end_price (int &steps, double &start, double &inRate, double &vol, double &dt) {
+double end_price (const int &steps, double &start, double &inRate, double &vol, double &dt) {
     double current_price = start;
     for (int n = 1; n <= steps; n++) {
         current_price = one_step(current_price, inRate, vol, dt);
