@@ -15,20 +15,19 @@ int main() {
 //swear I am going to put these into a strucure
     double inRate = 0.1, sigma = 0.3, expire = 0.5;
     double stock = 1, strike = 1;
-    int steps = 50;
+    int steps = 1;
     double dt = expire / steps;
     double discount_factor = exp(-inRate * expire);
     int npaths = 1000000;
-    double sum_payoff = 0;
+    double running_avg = 0;
     double payoff;
     for (int type = 0; type <= 1; type++) {
         for (int n = 1; n <= npaths; n++) {
             payoff = get_payoff(type, steps, stock, inRate, sigma, dt, strike);
-            sum_payoff += payoff;
+            running_avg = (running_avg * (n - 1) + payoff) / n;
         }
 
-        double avg = sum_payoff / npaths; 
-        double price = discount_factor * avg;
+        double price = discount_factor * running_avg;
         if (type == 0 ) {
             std::cout << "Monte carlo price for lookback min_price put is " << price << std::endl;
         }
