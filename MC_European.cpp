@@ -17,7 +17,6 @@ double min_price(const Option &put);
 double max_price(const Option &put);
 
 int main() {
-    // swear I am going to put these into a strucure
     Option put;
     put.inRate = 0.1;
     put.vol = 0.3;
