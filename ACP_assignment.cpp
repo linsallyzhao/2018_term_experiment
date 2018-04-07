@@ -24,7 +24,7 @@ int main() {
     option.steps = 252;
     option.dt = option.expire / option.steps;
     option.discount_factor = exp(-option.inRate * option.expire);
-    int npaths = 100000;
+    int npaths = 1000;
     double running_avg = 0;
     double payoff = -1;
     std::vector<bool> argBool {true, false};
@@ -40,12 +40,11 @@ int main() {
                     }
 
                     double price = option.discount_factor * running_avg;
-                    std::cout << "Option info : ";
-                    std::cout << "Discrete sampling (each " << gap << " days), ";
-                    std::cout << (flo ? "Floating strike, " : "Fixed strike, ");
-                    std::cout << (ave_type ? "Arithmetic Average, " : "Geometric Average, ");
-                    std::cout << (op_type ? "Call option" : "Put option") << std::endl;
-                    std::cout << "Price : " << price << std::endl;
+                    std::cout << "discrete_sampling_" << gap << "days ";
+                    std::cout << (flo ? "floating_strike " : "fixed_strike ");
+                    std::cout << (ave_type ? "arith_avg " : "geom_avg ");
+                    std::cout << (op_type ? "call_opt " : "put_opt ");
+                    std::cout << price << std::endl;
                 }
             }
         }
@@ -61,12 +60,11 @@ int main() {
                 }
 
                 double price = option.discount_factor * running_avg;
-                std::cout << "Option info : ";
-                std::cout << "Continuous sampling, ";
-                std::cout << (flo ? "Floating strike, " : "Fixed strike, ");
-                std::cout << (ave_type ? "Arithmetic Average, " : "Geometric Average, ");
-                std::cout << (op_type ? "Call option" : "Put option") << std::endl;
-                std::cout << "Price : " << price << std::endl;
+                std::cout << "continuous_sampling ";
+                std::cout << (flo ? "floating_strike " : "fixed_strike ");
+                std::cout << (ave_type ? "arith_avg " : "geom_avg ");
+                std::cout << (op_type ? "call_opt " : "put_opt ");
+                std::cout << price << std::endl;
             }
         }
     }
