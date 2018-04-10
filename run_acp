@@ -2,16 +2,15 @@
 
 declare -A output_map
 
-npaths=(100 200 300)
-
 output_map['_']=''
 
-for npath in "${npaths[@]}"; do
-    output_map['_']+="$npath,"
+for (( i = 1000; i <= 100000; i += 500 )); do
+    printf 'Running %s\n' "$i" >&2
+    output_map['_']+="$i,"
     while read -r key price _ stderr; do
         output_map["$key"]+="$price,"
         output_map["${key}_stderr"]+="$stderr,"
-    done < <(./ACP_assignment "$npath")
+    done < <(./ACP_assignment "$i")
 done
 
 {
