@@ -28,16 +28,19 @@ int main() {
     std::unordered_map<std::string, double> payoffs;
     std::vector<int> gaps {5, 22};
     std::unordered_map<std::string, double> running_avgs;
+    std::unordered_map<std::string, double> running_sqr_avgs;
     int gap = 5;
 
     for (const auto & [ key, value ] : payoffs) {
         running_avgs[key] = 0.0;
+        running_sqr_avgs[key]  = 0.0;
     }
 
     for (int n = 1; n <= npaths; n++) {
         payoffs = get_payoffs(gap, option);
         for (const auto & [ key, value ] : payoffs) {
             running_avgs[key] = (running_avgs[key] * (n - 1) + value) / n;
+            running_sqr_avgs[key] = (running_sqr_avgs[key] * (n - 1) + value * value) / n;
         }
     }
 
@@ -45,6 +48,12 @@ int main() {
     for (const auto & [ key, value ] : running_avgs) {
         price = option.discount_factor * value;
         std::cout << key << " " << price << std::endl;
+        double std_payoffs = std::pow(running_sqr_avgs[key] *
+                    std::pow(option.discount_factor, 2) - std::pow(price, 2), 0.5);
+        double std_error = std_payoffs / std::pow(npaths, 0.5);
+
+        std::cout << "standard error is " << std_error << std::endl;
+
     }
 
 
