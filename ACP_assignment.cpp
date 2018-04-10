@@ -14,7 +14,7 @@ struct Option {
 std::unordered_map<std::string, double> get_payoffs(const int &gap, const Option &option);
 double one_step(const double &old, const Option &option);
 
-int main() {
+int main(int argc, char* argv[]) {
     Option option;
     option.inRate = 0.05;
     option.vol = 0.2;
@@ -24,12 +24,18 @@ int main() {
     option.steps = 252;
     option.dt = option.expire / option.steps;
     option.discount_factor = exp(-option.inRate * option.expire);
-    int npaths = 100000;
     std::unordered_map<std::string, double> payoffs;
     std::vector<int> gaps {5, 22};
     std::unordered_map<std::string, double> running_avgs;
     std::unordered_map<std::string, double> running_sqr_avgs;
     int gap = 5;
+
+    if (argc < 2) {
+        std::cerr << "You need to give npaths" << std::endl;
+        exit(1);
+    }
+
+    auto npaths = std::stoi(argv[1]);
 
     for (const auto & [ key, value ] : payoffs) {
         running_avgs[key] = 0.0;
@@ -47,12 +53,12 @@ int main() {
     double price = 0.0;
     for (const auto & [ key, value ] : running_avgs) {
         price = option.discount_factor * value;
-        std::cout << key << " " << price << std::endl;
+        std::cout << key << " " << price << " ";
         double std_payoffs = std::pow(running_sqr_avgs[key] *
                     std::pow(option.discount_factor, 2) - std::pow(price, 2), 0.5);
         double std_error = std_payoffs / std::pow(npaths, 0.5);
 
-        std::cout << "standard error is " << std_error << std::endl;
+        std::cout << "stderr " << std_error << std::endl;
 
     }
 
