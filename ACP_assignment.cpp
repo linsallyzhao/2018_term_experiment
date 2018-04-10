@@ -14,7 +14,7 @@ struct Option {
 std::unordered_map<std::string, double> get_payoffs(const int &gap, const Option &option);
 double one_step(const double &old, const Option &option);
 
-int main(int argc, char* argv[]) {
+int main(void) {
     Option option;
     option.inRate = 0.05;
     option.vol = 0.2;
@@ -29,13 +29,7 @@ int main(int argc, char* argv[]) {
     std::unordered_map<std::string, double> running_avgs;
     std::unordered_map<std::string, double> running_sqr_avgs;
     int gap = 5;
-
-    if (argc < 2) {
-        std::cerr << "You need to give npaths" << std::endl;
-        exit(1);
-    }
-
-    auto npaths = std::stoi(argv[1]);
+    int npaths = 10000;
 
     for (const auto & [ key, value ] : payoffs) {
         running_avgs[key] = 0.0;
