@@ -20,13 +20,11 @@ int main(void) {
     option.realVol = 0.3;
     option.stock = 100;
     option.strike = 100;
-    int hedgingTimes = 252;
-    int changesEachDay = 1;
-    option.steps = hedgingTimes * changesEachDay;
-    option.expire = hedgingTimes / 252.0;
+    option.steps = 252;
+    option.expire = 1.0;
     option.dt = option.expire / option.steps;
     option.discount_factor = exp(-option.inRate * option.expire);
-    int npaths = 1000000;
+    int npaths = 100000;
 
     double dOne_1 = get_dOne(option, true, 0);
     double dOne_2 = get_dOne(option, false, 0);
@@ -40,12 +38,15 @@ int main(void) {
     std::cout << "price diff of two vols: " << initialOptionPrice1 - initialOptionPrice2 << std::endl;
 
     double currentHedge_1, currentHedge_2, cash_1, cash_2, oldPrice_1, delta_1, delta_2, payoff,
-           oldPrice_2, optionPrice1, optionPrice2, hedgePosition_2, hedgePosition_1, oldStock, changeStock;
+           oldPrice_2, optionPrice1, optionPrice2, hedgePosition_2, hedgePosition_1, oldStock, changeStock,
+           closeToday_1, closeToday_2;
     std::ofstream output;
-    output.open("finalCash_dayilyChange1_1mm");
+    output.open("finalCash_hedge3TimesPerDay_1mm");
     output << "finalCash_realVol,finalCash_pricingVol" << std::endl;
-    std::ofstream anotherOutPut;
-    anotherOutPut.open("daylyPositionHedged_dailyChange1_1mm");
+    //std::ofstream anotherOutPut;
+    //anotherOutPut.open("daylyPositionHedged_hedgeEveryTwoDay_1mm");
+    std::ofstream closeTest;
+    closeTest.open("daylyClose_252Days");
     for (int n = 1; n <= npaths; n++) {
         option.stock = 100.00;
         delta_1 = initialDelta_1;
@@ -60,10 +61,6 @@ int main(void) {
         optionPrice2 = initialOptionPrice2;
         //std::cout << "hedgePosition: ";
         for (int stepNow = 1; stepNow <= option.steps; stepNow++){
-            if (stepNow % changesEachDay != 0){
-                option.stock = one_step(option.stock, option);
-                continue;
-            }
             oldStock = option.stock;
             option.stock = one_step(option.stock, option);
             changeStock = option.stock-oldStock;
@@ -73,24 +70,28 @@ int main(void) {
             dOne_2 = get_dOne(option, false, stepNow);
             delta_1 = std::erfc(-dOne_1/std::sqrt(2))/2;
             delta_2 = std::erfc(-dOne_2/std::sqrt(2))/2;
-            oldPrice_1 = optionPrice1;
-            oldPrice_2 = optionPrice2;
-            optionPrice1 = option.stock*delta_1 - option.strike*option.discount_factor
-                *std::erfc(-(dOne_1-(option.realVol*pow(option.expire-stepNow*option.dt, 0.5)))/std::sqrt(2))/2;
+            //oldPrice_1 = optionPrice1;
+            //oldPrice_2 = optionPrice2;
+            //optionPrice1 = option.stock*delta_1 - option.strike*option.discount_factor
+            //    *std::erfc(-(dOne_1-(option.realVol*pow(option.expire-stepNow*option.dt, 0.5)))/std::sqrt(2))/2;
             optionPrice2 = option.stock*delta_1 - option.strike*option.discount_factor
                 *std::erfc(-(dOne_1-(option.pricingVol*pow(option.expire-stepNow*option.dt, 0.5)))/std::sqrt(2))/2;
-            hedgePosition_1 = (optionPrice1-oldPrice_1)-currentHedge_1*changeStock; //ideally, this should be close to zero
-            hedgePosition_2 = (optionPrice2-oldPrice_2)-currentHedge_2*changeStock;
+            //hedgePosition_1 = (optionPrice1-oldPrice_1)-currentHedge_1*changeStock; //ideally, this should be close to zero
+            //hedgePosition_2 = (optionPrice2-oldPrice_2)-currentHedge_2*changeStock;
 
             //std::cout << hedgePosition_1 << " " << hedgePosition_2 << "    ";
-            anotherOutPut << hedgePosition_1 << "," << hedgePosition_2 << ",";
+            //anotherOutPut << hedgePosition_1 << "," << hedgePosition_2 << ",";
 
             cash_1 += (delta_1-currentHedge_1)*option.stock;
             cash_2 += (delta_2-currentHedge_2)*option.stock;
+            closeToday_1 = cash_1+optionPrice2-delta_1*option.stock;
+            closeToday_2 = cash_2+optionPrice2-delta_2*option.stock;
+            closeTest << closeToday_1 << "," << closeToday_2 << ",";
         }
 
         //std::cout << std::endl;
-        anotherOutPut << std::endl;
+        //anotherOutPut << std::endl;
+        closeTest << std::endl;
         payoff = std::max(option.stock-option.strike, 0.0);
         cash_1 += payoff-delta_1*option.stock;
         cash_2 += payoff-delta_2*option.stock;
